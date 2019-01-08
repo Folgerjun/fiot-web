@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <div class="select-project">
       <el-select v-model="projectName" placeholder="请选择项目">
         <el-option
@@ -23,13 +22,14 @@
         {{showMessage}}
       </div>
     </div>
-    <div class="project-model">
+    <div id="project-model">
       <!-- project Model -->
     </div>
 
   </div>
 </template>
 <script type="text/ecmascript-6">
+  import * as Three from 'three';
   export default {
     data() {
       return {
@@ -38,7 +38,11 @@
         projectName: '',  // 项目名字
         showMessage: '',  // 项目描述
         projectLogo: '',  // 项目 logo
-        projectImg: ''  // 项目图片
+        projectImg: '',  // 项目图片
+        camera: null,
+        scene: null,
+        renderer: null,
+        mesh: null
       };
     },
     created() {
@@ -72,6 +76,8 @@
           console.log('searchPro res:', res);
           if (res && res.code === 200) {
             // 查询成功 项目相关信息
+            // 模型数据清空
+            document.getElementById('project-model').innerHTML = '';
             let projectModel = res.obj;
             console.log('project', projectModel);
             this.showMessage = projectModel.introduction;
@@ -109,11 +115,40 @@
           if (res && res.code === 200) {
             // 切换成功
             this.$message('功能尚在开发ing...');
+            this.projectImg = '';
+            this.showMessage = '';
+            document.getElementById('project-model').innerHTML = '';
+            this.init();
+            this.animate();
           } else {
           }
         }).catch((err) => {
           console.log(err);
         });
+      },
+      init: function() {
+        let container = document.getElementById('project-model');
+
+        this.camera = new Three.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 0.01, 10);
+        this.camera.position.z = 1;
+
+        this.scene = new Three.Scene();
+
+        let geometry = new Three.BoxGeometry(0.2, 0.2, 0.2);
+        let material = new Three.MeshNormalMaterial();
+
+        this.mesh = new Three.Mesh(geometry, material);
+        this.scene.add(this.mesh);
+
+        this.renderer = new Three.WebGLRenderer({antialias: true});
+        this.renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(this.renderer.domElement);
+      },
+      animate: function() {
+        requestAnimationFrame(this.animate);
+        this.mesh.rotation.x += 0.01;
+        this.mesh.rotation.y += 0.02;
+        this.renderer.render(this.scene, this.camera);
       }
     }
   };
@@ -134,5 +169,8 @@
   }
   .show-message .project-desc {
     text-align: center;
+  }
+  #project-model {
+    height: 500px;
   }
 </style>

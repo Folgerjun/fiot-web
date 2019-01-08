@@ -19,6 +19,7 @@
     "js-cookie": "^2.2.0",
     "lockr": "^0.8.4",
     "nprogress": "^0.2.0",
+    "three": "^0.100.0",
     "vue": "^2.5.9",
     "vue-infinite-scroll": "^2.0.2",
     "vue-lazyload": "^1.1.4",
